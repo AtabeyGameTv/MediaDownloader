@@ -1,6 +1,8 @@
 import os
 import threading
 import time
+import subprocess
+import sys
 import imageio_ffmpeg
 from flask import Flask, render_template_string, request, jsonify, send_from_directory
 from flask_cors import CORS
@@ -21,6 +23,19 @@ download_state = {
     'filename': '',
     'error': ''
 }
+
+# Hər dəfə proqram işə düşəndə yt-dlp-ni avtomatik yeniləyən funksiya
+def auto_update_ytdlp():
+    try:
+        print("🔄 yt-dlp versiyası yoxlanılır...")
+        subprocess.run(
+            [sys.executable, "-m", "pip", "install", "--upgrade", "yt-dlp"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=False
+        )
+    except Exception:
+        pass
 
 def progress_hook(d):
     if d['status'] == 'downloading':
@@ -427,5 +442,8 @@ def get_file(filename):
     return send_from_directory(DOWNLOAD_DIR, filename, as_attachment=True)
 
 if __name__ == '__main__':
+    # Server başlamazdan əvvəl avtomatik yeniləməni işə salırıq
+    auto_update_ytdlp()
+    
     print("🚀 MediaDownloader serveri işə düşdü: http://127.0.0.1:5000")
     app.run(host='0.0.0.0', port=5000, debug=True)
