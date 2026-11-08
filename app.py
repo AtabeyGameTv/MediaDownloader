@@ -45,12 +45,20 @@ def run_download(url, format_type, quality):
     out_template = os.path.join(DOWNLOAD_DIR, '%(title)s.%(ext)s')
     ffmpeg_path = imageio_ffmpeg.get_ffmpeg_exe()
 
+    # YouTube bot qorunmalarını keçmək üçün ortaq klient ayarları
+    common_extractor_args = {
+        'youtube': {
+            'player_client': ['android', 'web']
+        }
+    }
+
     if format_type == 'mp3':
         ydl_opts = {
             'format': 'bestaudio/best',
             'outtmpl': out_template,
             'ffmpeg_location': ffmpeg_path,
             'progress_hooks': [progress_hook],
+            'extractor_args': common_extractor_args,
             'postprocessors': [{
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': 'mp3',
@@ -72,6 +80,7 @@ def run_download(url, format_type, quality):
             'merge_output_format': 'mp4',
             'ffmpeg_location': ffmpeg_path,
             'progress_hooks': [progress_hook],
+            'extractor_args': common_extractor_args,
             'quiet': True,
         }
 
